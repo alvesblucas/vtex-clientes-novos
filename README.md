@@ -28,6 +28,22 @@ servidor, banco de dados nem instalação na loja.
 
 Veja um exemplo com dados fictícios: baixe [docs/exemplo-painel.html](docs/exemplo-painel.html) e abra no navegador.
 
+**Escolha os dias no calendário**, ou use os atalhos da semana e do mês:
+
+![Calendário do painel com um intervalo de 06/10 a 17/10 selecionado](docs/painel-calendario.png)
+
+**Clique num canal e o painel inteiro se ajusta.** Aqui, só o Google Ads: 42% de clientes novos,
+ticket médio e evolução semanal do canal.
+
+![Painel filtrado pelo canal Google Ads](docs/painel-filtro.png)
+
+**Recorrentes: por qual canal voltaram e de qual vieram.** Mostra, por exemplo, quanto do WhatsApp é
+cliente que comprou antes pelo Google Ads.
+
+![Recorrentes por canal de volta, com a parte que já comprava pelo canal e a que veio de outro](docs/painel-recorrentes.png)
+
+*Todas as imagens usam uma loja fictícia.*
+
 **Um comentário numa issue** do seu repositório (o GitHub manda por e-mail) com o resumo da semana e
 do **mês até agora**: totais, divisão por canal, recorrentes por canal anterior e detalhe por UTM.
 
