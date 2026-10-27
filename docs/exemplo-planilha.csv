@@ -1,0 +1,8 @@
+﻿pedido;data;status;valor;tipo_cliente;canal;ultima_compra_anterior;canal_compra_anterior;pessoa;utm_source;utm_medium;utm_campaign;cupom
+ana;20/10/2026 12:00;invoiced;100,50;recorrente;WhatsApp;01/06/2025;WhatsApp;PF;weni;whatsapp;recompra;
+bruno;21/10/2026 12:00;invoiced;200,00;novo;Google Ads;;;PF;google;cpc;search-marca;
+empresa-1;22/10/2026 12:00;handling;50,00;novo;Sem UTM;;;PJ;;;;
+sem-documento;23/10/2026 12:00;invoiced;1,00;indefinido;Sem UTM;;;;;;;
+empresa-2;24/10/2026 12:00;invoiced;70,00;recorrente;Outros;22/10/2026;Sem UTM;PJ;parceiro-x;;;
+cancelado;25/10/2026 12:00;canceled;9,99;novo;Sem UTM;;;PF;;;;
+chat;25/10/2026 14:00;invoiced;3,00;novo;Chat no site;;;PF;weni;webchat;duvidas;

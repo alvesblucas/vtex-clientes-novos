@@ -1,0 +1,13 @@
+{
+  "name": "vtex-clientes-novos",
+  "version": "1.0.0",
+  "description": "Relatório semanal de clientes novos x recorrentes por canal (UTM) para lojas VTEX, via GitHub Actions.",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node scripts/clientes-novos.mjs",
+    "test": "node --test test/clientes-novos.test.mjs"
+  },
+  "license": "MIT"
+}

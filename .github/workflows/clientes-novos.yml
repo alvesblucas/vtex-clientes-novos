@@ -1,0 +1,71 @@
+name: Clientes novos x recorrentes
+
+# Toda segunda: pedidos da semana anterior marcados como cliente novo ou recorrente, por canal.
+# Resumo num comentário da issue "Clientes novos x recorrentes" e planilha (sem nome, e-mail ou
+# CPF) no artefato da execução. Só lê pedidos da VTEX.
+on:
+  schedule:
+    - cron: '15 11 * * 1'   # segunda, 08:15 no horário de Brasília
+  workflow_dispatch:
+    inputs:
+      week_start:
+        description: 'Segunda-feira da semana a refazer (AAAA-MM-DD). Vazio = semana anterior.'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  classificar:
+    # O próprio repositório do template não tem loja configurada.
+    if: github.repository != 'alvesblucas/vtex-clientes-novos'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30   # ~700 pedidos por semana levam ~4 min
+    env:
+      GH_TOKEN: ${{ github.token }}
+      LABEL: clientes-novos
+    steps:
+      # O resumo e a planilha mostram o faturamento da loja: num repositório público, qualquer
+      # pessoa veria. Só roda em repositório público se a variável PERMITIR_REPO_PUBLICO = true.
+      - name: Conferir se o repositório é privado
+        if: ${{ !github.event.repository.private && vars.PERMITIR_REPO_PUBLICO != 'true' }}
+        run: |
+          echo "::error::Este repositório é público e o relatório mostra o faturamento da loja. Torne-o privado (Settings → General → Danger Zone → Change visibility)."
+          exit 1
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Classificar pedidos
+        env:
+          VTEX_ACCOUNT: ${{ vars.VTEX_ACCOUNT }}
+          VTEX_APP_KEY: ${{ secrets.VTEX_APP_KEY }}
+          VTEX_APP_TOKEN: ${{ secrets.VTEX_APP_TOKEN }}
+          SALES_CHANNEL: ${{ vars.CANAL_DE_VENDA || '1' }}
+          HISTORY_DAYS: ${{ vars.DIAS_DE_HISTORICO || '730' }}
+          WEEK_START: ${{ github.event.inputs.week_start }}
+        run: node scripts/clientes-novos.mjs
+      - name: Guardar a planilha
+        if: ${{ !cancelled() && hashFiles('clientes-novos.csv') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: clientes-novos
+          path: clientes-novos.csv
+          retention-days: 90
+      - name: Publicar na issue
+        if: ${{ !cancelled() && hashFiles('clientes-novos.md') != '' }}
+        env:
+          RESPONSAVEL: ${{ vars.RESPONSAVEL }}
+        run: |
+          echo "" >> clientes-novos.md
+          echo "Planilha: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID (seção Artifacts)" >> clientes-novos.md
+          gh label create "$LABEL" --color 0e8a16 --description "Relatório semanal de clientes novos x recorrentes" 2>/dev/null || true
+          issue=$(gh issue list --label "$LABEL" --state open --limit 1 --json number -q '.[0].number')
+          if [ -z "$issue" ]; then
+            issue=$(gh issue create --title "Clientes novos x recorrentes" --label "$LABEL" ${RESPONSAVEL:+--assignee "$RESPONSAVEL"} \
+              --body "Relatório semanal gerado por .github/workflows/clientes-novos.yml. Cada semana entra um comentário novo." \
+              | grep -o '[0-9]*$')
+          fi
+          gh issue comment "$issue" --body-file clientes-novos.md

@@ -1,0 +1,14 @@
+{
+  "antigo-ana": { "creationDate": "2025-06-01T12:00:00Z", "status": "invoiced", "cpf": "11111111111", "utm": { "utmSource": "suri", "utmMedium": "whatsapp", "utmCampaign": "promo-junho" } },
+  "antigo-bruno-cancelado": { "creationDate": "2025-07-01T12:00:00Z", "status": "canceled", "cpf": "22222222222" },
+  "ana": { "creationDate": "2026-10-20T15:00:00Z", "status": "invoiced", "cpf": "11111111111", "value": 10050, "utm": { "utmSource": "weni", "utmMedium": "whatsapp", "utmCampaign": "recompra" } },
+  "bruno": { "creationDate": "2026-10-21T15:00:00Z", "status": "invoiced", "cpf": "22222222222", "value": 20000, "utm": { "utmSource": "google", "utmMedium": "cpc", "utmCampaign": "search-marca" } },
+  "empresa-1": { "creationDate": "2026-10-22T15:00:00Z", "status": "handling", "cnpj": "33333333000144", "value": 5000 },
+  "empresa-2": { "creationDate": "2026-10-24T15:00:00Z", "status": "invoiced", "cnpj": "33333333000144", "value": 7000, "utm": { "utmSource": "parceiro-x" } },
+  "sem-documento": { "creationDate": "2026-10-23T15:00:00Z", "status": "invoiced", "value": 100 },
+  "cancelado": { "creationDate": "2026-10-25T15:00:00Z", "status": "canceled", "cpf": "44444444444", "value": 999 },
+  "outro-canal": { "creationDate": "2026-10-25T16:00:00Z", "status": "invoiced", "cpf": "55555555555", "value": 1, "salesChannel": "2" },
+  "chat": { "creationDate": "2026-10-25T17:00:00Z", "status": "invoiced", "cpf": "66666666666", "value": 300, "utm": { "utmSource": "weni", "utmMedium": "webchat", "utmCampaign": "duvidas" } },
+  "domingo-anterior": { "creationDate": "2026-10-19T02:30:00Z", "status": "invoiced", "cpf": "88888888888", "value": 1 },
+  "semana-seguinte": { "creationDate": "2026-10-26T03:30:00Z", "status": "invoiced", "cpf": "77777777777", "value": 1 }
+}

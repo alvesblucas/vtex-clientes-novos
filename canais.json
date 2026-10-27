@@ -1,0 +1,14 @@
+{
+  "_como_funciona": "Cada pedido recebe o primeiro canal cuja expressão (regex, sem diferenciar maiúsculas) casar com o texto 'utm_source utm_medium utm_campaign'. A ordem importa: regras mais específicas primeiro. Pedido sem UTM vira 'Sem UTM'; sem regra que case, vira 'Outros' (e a UTM aparece no resumo para você ajustar). Em JSON, a barra invertida da regex é escrita duas vezes: \\b.",
+  "canais": [
+    { "nome": "Chat no site", "padrao": "webchat|chat-?site|shopping_assistant" },
+    { "nome": "WhatsApp", "padrao": "whats|wpp|zap|weni|blip|zenvia|suri" },
+    { "nome": "Google Ads", "padrao": "^-?ga(-|\\b)|google|gclid|adwords|\\bcpc\\b" },
+    { "nome": "Meta Ads / Instagram", "padrao": "^(ig|fb)\\b|instagram|facebook|\\bmeta\\b|link-?(da-?|in-?)bio" },
+    { "nome": "TikTok", "padrao": "tiktok" },
+    { "nome": "E-mail", "padrao": "e-?mail|newsletter|edrone|rd-?station|mailchimp|klaviyo|dinamize|allin" },
+    { "nome": "App", "padrao": "^app[_-]" },
+    { "nome": "Afiliados", "padrao": "afiliad|awin|afilio|lomadee|rakuten" },
+    { "nome": "IA (ChatGPT etc.)", "padrao": "chatgpt|openai|perplexity|gemini|copilot|claude" }
+  ]
+}
