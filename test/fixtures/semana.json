@@ -10,5 +10,7 @@
   "outro-canal": { "creationDate": "2026-10-25T16:00:00Z", "status": "invoiced", "cpf": "55555555555", "value": 1, "salesChannel": "2" },
   "chat": { "creationDate": "2026-10-25T17:00:00Z", "status": "invoiced", "cpf": "66666666666", "value": 300, "utm": { "utmSource": "weni", "utmMedium": "webchat", "utmCampaign": "duvidas" } },
   "domingo-anterior": { "creationDate": "2026-10-19T02:30:00Z", "status": "invoiced", "cpf": "88888888888", "value": 1 },
+  "inicio-do-mes": { "creationDate": "2026-10-01T03:30:00Z", "status": "invoiced", "cpf": "99999999999", "value": 500, "utm": { "utmSource": "google", "utmMedium": "cpc" } },
+  "fim-de-setembro": { "creationDate": "2026-10-01T02:30:00Z", "status": "invoiced", "cpf": "12121212121", "value": 1 },
   "semana-seguinte": { "creationDate": "2026-10-26T03:30:00Z", "status": "invoiced", "cpf": "77777777777", "value": 1 }
 }

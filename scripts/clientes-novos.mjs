@@ -1,5 +1,5 @@
-// Classifica os pedidos de uma loja VTEX da semana anterior em cliente "novo" ou "recorrente",
-// agrupados por canal de aquisição (UTM). Node 20+, sem dependências. Só lê a OMS.
+// Classifica os pedidos de uma loja VTEX da semana anterior, e do mês dessa semana até o domingo,
+// em cliente "novo" ou "recorrente", agrupados por canal de aquisição (UTM). Node 20+, sem dependências. Só lê a OMS.
 //
 // Novo = sem pedido não cancelado no mesmo canal de venda nos HISTORY_DAYS dias antes deste pedido.
 // A OMS só devolve pedidos dos últimos 2 anos, então 730 dias é o máximo.
@@ -7,8 +7,10 @@
 // dados só são usados em memória: a saída não traz nome, e-mail nem documento.
 //
 // Saída:
-//   clientes-novos.csv  -> um pedido por linha (; e vírgula decimal, abre direto no Excel)
-//   clientes-novos.md   -> resumo para o comentário da issue
+//   clientes-novos.csv          -> pedidos da semana, um por linha (; e vírgula decimal, abre direto no Excel)
+//   clientes-novos-mes.csv      -> a mesma planilha com os pedidos do mês
+//   clientes-novos.md           -> resumo da semana e do mês para o comentário da issue
+//   clientes-novos-painel.html  -> painel interativo (abre no navegador, sem instalar nada)
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
@@ -24,6 +26,8 @@ const {
   OPEN_CONCURRENCY = '5',
   CHANNELS_FILE = fileURLToPath(new URL('../canais.json', import.meta.url)),
   CSV_FILE = 'clientes-novos.csv',
+  MONTH_CSV_FILE = 'clientes-novos-mes.csv',
+  PANEL_FILE = 'clientes-novos-painel.html',
   SUMMARY_FILE = 'clientes-novos.md',
 } = process.env
 
@@ -45,11 +49,16 @@ const headers = {
 }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
-async function api(path, tries = 3) {
+// 429 (limite da OMS) e 5xx: espera o Retry-After, ou 2s, 4s, 8s, 16s, 32s, antes de desistir.
+async function api(path, tries = 6) {
   for (let i = 1; i <= tries; i++) {
     const res = await fetch(base + path, { headers })
     if (res.ok) return res.json().catch(() => null)
-    if ((res.status === 429 || res.status >= 500) && i < tries) { await sleep(1500 * i); continue }
+    if ((res.status === 429 || res.status >= 500) && i < tries) {
+      const after = Number(res.headers.get('retry-after'))
+      await sleep(after > 0 ? after * 1000 : 1000 * 2 ** i)
+      continue
+    }
     if (res.status === 401 || res.status === 403) {
       throw new Error(`GET ${path} -> ${res.status}: a chave não tem acesso. Ela precisa dos recursos "View order" e "List Orders" (OMS).`)
     }
@@ -90,6 +99,15 @@ function weekRange() {
   }
   if (new Date(startLocal).getUTCDay() !== 1) throw new Error(`WEEK_START precisa ser uma segunda-feira: ${WEEK_START}`)
   return { start: startLocal - TZ, end: startLocal - TZ + 7 * DAY }
+}
+
+// Mês da segunda-feira, do dia 1 até o domingo da semana (ou até o fim do mês, se a semana virar o
+// mês). Ex.: a semana de 26/10 a 01/11 traz outubro fechado, de 01/10 a 31/10.
+function monthRange(week) {
+  const monday = new Date(week.start + TZ)
+  const first = Date.UTC(monday.getUTCFullYear(), monday.getUTCMonth(), 1) - TZ
+  const next = Date.UTC(monday.getUTCFullYear(), monday.getUTCMonth() + 1, 1) - TZ
+  return { start: first, end: Math.min(next, week.end), closed: next <= week.end }
 }
 
 const brDate = (ms) => new Date(ms + TZ).toISOString().slice(0, 10).split('-').reverse().join('/')
@@ -145,15 +163,18 @@ async function previousPurchase(order, who) {
   return null
 }
 
-const { start, end } = weekRange()
-console.log(`Semana: ${brDate(start)} a ${brDate(end - 1)} | conta ${VTEX_ACCOUNT} | canal de venda ${SALES_CHANNEL} | todos os status`)
+const week = weekRange()
+const month = monthRange(week)
+const { start, end } = week
+console.log(`Semana: ${brDate(start)} a ${brDate(end - 1)} | mês: ${brDate(month.start)} a ${brDate(month.end - 1)} | conta ${VTEX_ACCOUNT} | canal de venda ${SALES_CHANNEL} | todos os status`)
 
+// Lê do dia 1 do mês até o domingo de uma vez; a semana e o mês são recortes da mesma lista.
 const listed = []
-for (let d = start; d < end; d += DAY) listed.push(...(await listOrders(d, d + DAY)))
+for (let d = month.start; d < end; d += DAY) listed.push(...(await listOrders(d, d + DAY)))
 const ids = [...new Set(listed.map((o) => o.orderId))]
-console.log(`Pedidos na semana: ${ids.length}`)
+console.log(`Pedidos no período: ${ids.length}`)
 
-const rows = []
+const allRows = []
 let done = 0, errors = 0, next = 0
 async function worker() {
   while (next < ids.length) {
@@ -164,7 +185,7 @@ async function worker() {
       const who = customerKey(order)
       const prev = who ? await previousPurchase(order, who) : null
       const m = order.marketingData || {}
-      rows.push({
+      allRows.push({
         orderId: order.orderId,
         created: Date.parse(order.creationDate),
         status: order.statusDescription || order.status,
@@ -191,15 +212,21 @@ async function worker() {
   }
 }
 await Promise.all(Array.from({ length: Math.max(1, Number(OPEN_CONCURRENCY)) }, worker))
-rows.sort((a, b) => a.created - b.created)
+allRows.sort((a, b) => a.created - b.created)
+const rows = allRows.filter((r) => r.created >= start)
+const monthRows = allRows.filter((r) => r.created < month.end)
 
 // CSV
 const csvCell = (v) => (/[;"\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : String(v))
-const csv = [
-  ['pedido', 'data', 'status', 'valor', 'tipo_cliente', 'canal', 'ultima_compra_anterior', 'canal_compra_anterior', 'pessoa', 'utm_source', 'utm_medium', 'utm_campaign', 'cupom'],
-  ...rows.map((r) => [r.orderId, brDateTime(r.created), r.status, money(r.value), r.tipo, r.channel, r.prevDate ? brDate(r.prevDate) : '', r.prevChannel, r.pessoa, r.utmSource, r.utmMedium, r.utmCampaign, r.coupon]),
-].map((l) => l.map(csvCell).join(';')).join('\r\n')
-fs.writeFileSync(CSV_FILE, '﻿' + csv + '\r\n')
+function writeCsv(file, list) {
+  const csv = [
+    ['pedido', 'data', 'status', 'valor', 'tipo_cliente', 'canal', 'ultima_compra_anterior', 'canal_compra_anterior', 'pessoa', 'utm_source', 'utm_medium', 'utm_campaign', 'cupom'],
+    ...list.map((r) => [r.orderId, brDateTime(r.created), r.status, money(r.value), r.tipo, r.channel, r.prevDate ? brDate(r.prevDate) : '', r.prevChannel, r.pessoa, r.utmSource, r.utmMedium, r.utmCampaign, r.coupon]),
+  ].map((l) => l.map(csvCell).join(';')).join('\r\n')
+  fs.writeFileSync(file, '﻿' + csv + '\r\n')
+}
+writeCsv(CSV_FILE, rows)
+writeCsv(MONTH_CSV_FILE, monthRows)
 
 // Resumo: pedidos cancelados entram na contagem, mas não na receita.
 function tally(list) {
@@ -215,9 +242,9 @@ const pct = (a, b) => (b ? `${Math.round((a / b) * 100)}%` : '–')
 const total = tally(rows)
 const valid = total.novo.n + total.recorrente.n + total.indefinido.n
 
-function groupLines(keyOf) {
+function groupLines(keyOf, list = rows) {
   const groups = new Map()
-  for (const r of rows) groups.set(keyOf(r), [...(groups.get(keyOf(r)) || []), r])
+  for (const r of list) groups.set(keyOf(r), [...(groups.get(keyOf(r)) || []), r])
   return [...groups.entries()]
     .map(([k, list]) => [k, tally(list)])
     .sort((a, b) => (b[1].novo.v + b[1].recorrente.v) - (a[1].novo.v + a[1].recorrente.v))
@@ -237,6 +264,10 @@ const migrationLines = [...migration.entries()].sort((a, b) => b[1] - a[1]).map(
 const tableHead = ['| Canal | Novos | Receita novos | Recorrentes | Receita recorrentes | % novos |', '|---|---:|---:|---:|---:|---:|']
 const months = Math.round(Number(HISTORY_DAYS) / 30.4)
 
+const monthTotal = tally(monthRows)
+const monthValid = monthTotal.novo.n + monthTotal.recorrente.n + monthTotal.indefinido.n
+const monthName = new Date(month.start + TZ).toLocaleDateString('pt-BR', { month: 'long', timeZone: 'UTC' })
+
 const md = [
   `## Clientes novos x recorrentes — ${brDate(start)} a ${brDate(end - 1)}`,
   '',
@@ -253,6 +284,25 @@ const md = [
   ...tableHead,
   ...channelLines,
   '',
+  `### Mês de ${monthName}${month.closed ? ' (fechado)' : ' até agora'} — ${brDate(month.start)} a ${brDate(month.end - 1)}`,
+  '',
+  `Pedidos: **${monthRows.length}** (${monthTotal.cancelados} cancelados, fora da receita abaixo).`,
+  '',
+  '| Tipo | Pedidos | % | Receita |',
+  '|---|---:|---:|---:|',
+  `| Novo | ${monthTotal.novo.n} | ${pct(monthTotal.novo.n, monthValid)} | ${moneyBr(monthTotal.novo.v)} |`,
+  `| Recorrente | ${monthTotal.recorrente.n} | ${pct(monthTotal.recorrente.n, monthValid)} | ${moneyBr(monthTotal.recorrente.v)} |`,
+  ...(monthTotal.indefinido.n ? [`| Sem CPF/e-mail | ${monthTotal.indefinido.n} | ${pct(monthTotal.indefinido.n, monthValid)} | ${moneyBr(monthTotal.indefinido.v)} |`] : []),
+  '',
+  '<details><summary>Mês por canal</summary>',
+  '',
+  ...tableHead,
+  ...groupLines((r) => r.channel, monthRows),
+  '',
+  '</details>',
+  '',
+  '### Detalhes da semana',
+  '',
   '<details><summary>Recorrentes: canal da compra anterior → canal desta compra</summary>',
   '',
   '| Anterior → agora | Pedidos |',
@@ -268,13 +318,43 @@ const md = [
   '',
   '</details>',
   '',
-  `Novo = sem compra nos ${months} meses anteriores (a VTEX guarda no máximo 2 anos de pedidos). A planilha com um`,
-  'pedido por linha está no artefato **clientes-novos** desta execução; cruze com o export do Admin pela coluna `pedido`.',
+  `Novo = sem compra nos ${months} meses anteriores (a VTEX guarda no máximo 2 anos de pedidos). As planilhas com um`,
+  'pedido por linha (semana e mês) estão no artefato **clientes-novos** desta execução; cruze com o export do Admin pela coluna `pedido`.',
+  '',
+  '📊 **Painel interativo:** no mesmo artefato, abra `clientes-novos-painel.html` no navegador (gráficos, filtros por canal e por data).',
   ...(unmatched.size ? ['', `UTMs sem canal (caíram em "Outros"; ajuste o \`canais.json\`): ${[...unmatched.keys()].map((k) => `\`${k}\``).join(', ')}`] : []),
   ...(errors ? ['', `⚠️ ${errors} pedido(s) não abriram e ficaram fora (ver log).`] : []),
 ].join('\n')
 fs.writeFileSync(SUMMARY_FILE, md + '\n')
 
+// Painel: HTML único com os pedidos da semana e do mês embutidos (sem nome, e-mail nem documento);
+// os gráficos são montados no navegador a partir do modelo clientes-novos-painel.html.
+const isoLocal = (ms) => new Date(ms + TZ).toISOString().slice(0, 10)
+const painel = {
+  loja: VTEX_ACCOUNT,
+  periodos: {
+    semana: { inicio: isoLocal(start), fim: isoLocal(end - 1) },
+    mes: { nome: monthName, inicio: isoLocal(month.start), fim: isoLocal(month.end - 1), fechado: month.closed },
+  },
+  pedidos: allRows.map((r) => ({
+    tipo: r.tipo,
+    cancelado: r.canceled,
+    valor: r.value,
+    canal: r.channel,
+    canalAnterior: r.prevChannel,
+    data: isoLocal(r.created),
+    utm: r.utmSource ? r.utmSource + (r.utmCampaign ? ' / ' + r.utmCampaign : '') : '',
+    s: r.created >= start,
+    m: r.created < month.end,
+    pj: r.pessoa === 'PJ',
+  })),
+  gerado: brDateTime(Date.now()),
+  nota: `Novo = sem compra nos ${months} meses anteriores (a VTEX guarda no máximo 2 anos de pedidos). Cancelados ficam fora de todos os números. Arquivo gerado pela automação; não contém nome, e-mail nem CPF.`,
+}
+const template = fs.readFileSync(new URL('./clientes-novos-painel.html', import.meta.url), 'utf8')
+fs.writeFileSync(PANEL_FILE, template.replace('__DADOS__', () => JSON.stringify(painel).replace(/</g, '\\u003c')))
+
 if (unmatched.size) console.log('UTMs sem canal (viraram "Outros"):', Object.fromEntries(unmatched))
+console.log(`Mês: pedidos=${monthRows.length} novos=${monthTotal.novo.n} recorrentes=${monthTotal.recorrente.n} cancelados=${monthTotal.cancelados}`)
 console.log(`Fim. pedidos=${rows.length} novos=${total.novo.n} recorrentes=${total.recorrente.n} indefinidos=${total.indefinido.n} cancelados=${total.cancelados} erros=${errors}`)
 if (errors) process.exitCode = 1

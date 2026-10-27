@@ -1,8 +1,8 @@
 name: Clientes novos x recorrentes
 
-# Toda segunda: pedidos da semana anterior marcados como cliente novo ou recorrente, por canal.
-# Resumo num comentário da issue "Clientes novos x recorrentes" e planilha (sem nome, e-mail ou
-# CPF) no artefato da execução. Só lê pedidos da VTEX.
+# Toda segunda: pedidos da semana anterior (e do mês dela até o domingo) marcados como cliente
+# novo ou recorrente, por canal. Resumo num comentário da issue "Clientes novos x recorrentes";
+# planilhas e painel interativo (sem nome, e-mail ou CPF) no artefato da execução. Só lê pedidos da VTEX.
 on:
   schedule:
     - cron: '15 11 * * 1'   # segunda, 08:15 no horário de Brasília
@@ -12,6 +12,10 @@ on:
         description: 'Segunda-feira da semana a refazer (AAAA-MM-DD). Vazio = semana anterior.'
         required: false
         default: ''
+      publicar:
+        description: 'Comentar o resumo na issue'
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -22,7 +26,7 @@ jobs:
     # O próprio repositório do template não tem loja configurada.
     if: github.repository != 'alvesblucas/vtex-clientes-novos'
     runs-on: ubuntu-latest
-    timeout-minutes: 30   # ~700 pedidos por semana levam ~4 min
+    timeout-minutes: 60   # ~700 pedidos por semana; no fim do mês, ~3.000 pedidos levam ~15 min
     env:
       GH_TOKEN: ${{ github.token }}
       LABEL: clientes-novos
@@ -47,20 +51,23 @@ jobs:
           HISTORY_DAYS: ${{ vars.DIAS_DE_HISTORICO || '730' }}
           WEEK_START: ${{ github.event.inputs.week_start }}
         run: node scripts/clientes-novos.mjs
-      - name: Guardar a planilha
+      - name: Guardar planilhas e painel
         if: ${{ !cancelled() && hashFiles('clientes-novos.csv') != '' }}
         uses: actions/upload-artifact@v4
         with:
           name: clientes-novos
-          path: clientes-novos.csv
+          path: |
+            clientes-novos.csv
+            clientes-novos-mes.csv
+            clientes-novos-painel.html
           retention-days: 90
       - name: Publicar na issue
-        if: ${{ !cancelled() && hashFiles('clientes-novos.md') != '' }}
+        if: ${{ !cancelled() && hashFiles('clientes-novos.md') != '' && github.event.inputs.publicar != 'false' }}
         env:
           RESPONSAVEL: ${{ vars.RESPONSAVEL }}
         run: |
           echo "" >> clientes-novos.md
-          echo "Planilha: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID (seção Artifacts)" >> clientes-novos.md
+          echo "Planilhas e painel: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID (seção Artifacts)" >> clientes-novos.md
           gh label create "$LABEL" --color 0e8a16 --description "Relatório semanal de clientes novos x recorrentes" 2>/dev/null || true
           issue=$(gh issue list --label "$LABEL" --state open --limit 1 --json number -q '.[0].number')
           if [ -z "$issue" ]; then
