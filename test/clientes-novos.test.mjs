@@ -31,11 +31,15 @@ function run(env = {}) {
     const r = Object.fromEntries(l.split(';').map((v, i) => [header[i], v]))
     return [r.pedido, r]
   }))
+  const monthCsv = fs.readFileSync(path.join(dir, 'clientes-novos-mes.csv'), 'utf8').trim().split('\r\n').slice(1)
+  const monthRows = Object.fromEntries(monthCsv.map((l) => [l.split(';')[0], l]))
   const md = fs.readFileSync(path.join(dir, 'clientes-novos.md'), 'utf8')
-  return { log, rows, md }
+  const html = fs.readFileSync(path.join(dir, 'clientes-novos-painel.html'), 'utf8')
+  const painel = JSON.parse(html.match(/<script id="dados" type="application\/json">(.*?)<\/script>/s)[1])
+  return { log, rows, monthRows, md, html, painel }
 }
 
-const { log, rows, md } = run()
+const { log, rows, monthRows, md, html, painel } = run()
 
 test('só entram pedidos da semana (segunda a domingo, horário de Brasília) e do canal de venda', () => {
   assert.deepEqual(Object.keys(rows).sort(), ['ana', 'bruno', 'cancelado', 'chat', 'empresa-1', 'empresa-2', 'sem-documento'])
@@ -81,8 +85,31 @@ test('UTM sem canal aparece no resumo e no log', () => {
   assert.match(log, /parceiro-x/)
 })
 
+test('mês: do dia 1 até o domingo da semana, no fuso do relatório', () => {
+  assert.deepEqual(Object.keys(monthRows).sort(), ['ana', 'bruno', 'cancelado', 'chat', 'domingo-anterior', 'empresa-1', 'empresa-2', 'inicio-do-mes', 'sem-documento'])
+  assert.match(md, /### Mês de outubro até agora — 01\/10\/2026 a 25\/10\/2026/)
+  assert.match(md, /Pedidos: \*\*9\*\*/)
+})
+
+test('semana que vira o mês traz o mês anterior fechado', () => {
+  const r = run({ WEEK_START: '2026-10-26' })
+  assert.match(r.md, /### Mês de outubro \(fechado\) — 01\/10\/2026 a 31\/10\/2026/)
+  assert.equal(r.painel.periodos.mes.fechado, true)
+  assert.deepEqual(r.painel.periodos.semana, { inicio: '2026-10-26', fim: '2026-11-01' })
+})
+
+test('painel: HTML único com os dados embutidos, semana e mês marcados', () => {
+  assert.equal(painel.loja, 'lojateste')
+  assert.deepEqual(painel.periodos.semana, { inicio: '2026-10-19', fim: '2026-10-25' })
+  assert.deepEqual(painel.periodos.mes, { nome: 'outubro', inicio: '2026-10-01', fim: '2026-10-25', fechado: false })
+  assert.equal(painel.pedidos.length, 9)
+  assert.equal(painel.pedidos.filter((p) => p.s).length, 7)
+  assert.equal(painel.pedidos.filter((p) => p.pj).length, 2)
+  assert.doesNotMatch(html, /__DADOS__/)
+})
+
 test('a saída não traz CPF, CNPJ nem e-mail', () => {
-  const all = JSON.stringify(rows) + md
+  const all = JSON.stringify(rows) + JSON.stringify(monthRows) + md + JSON.stringify(painel) // o HTML tem @media no CSS; confere os dados embutidos
   assert.doesNotMatch(all, /11111111111|33333333000144|@/)
 })
 
