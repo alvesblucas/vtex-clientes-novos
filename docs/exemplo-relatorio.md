@@ -1,48 +1,48 @@
-## Clientes novos x recorrentes — 19/10/2026 a 25/10/2026
+## Clientes novos x recorrentes — 14/09/2026 a 20/09/2026
 
-Pedidos do canal de venda 1: **320** (10 cancelados, fora da receita abaixo).
+Pedidos do canal de venda 1: **236** (3 cancelados, fora da receita abaixo).
 
 | Tipo | Pedidos | % | Receita |
 |---|---:|---:|---:|
-| Novo | 103 | 33% | R$ 27.727,20 |
-| Recorrente | 207 | 67% | R$ 54.015,46 |
+| Novo | 58 | 25% | R$ 13.598,84 |
+| Recorrente | 175 | 75% | R$ 41.895,63 |
 
 ### Por canal
 
 | Canal | Novos | Receita novos | Recorrentes | Receita recorrentes | % novos |
 |---|---:|---:|---:|---:|---:|
-| Google Ads | 30 | R$ 8.251,81 | 44 | R$ 11.476,04 | 41% |
-| Sem UTM | 26 | R$ 6.987,35 | 50 | R$ 12.225,17 | 34% |
-| App | 10 | R$ 2.129,64 | 61 | R$ 15.369,47 | 14% |
-| WhatsApp | 20 | R$ 5.462,26 | 33 | R$ 8.654,41 | 38% |
-| E-mail | 1 | R$ 216,79 | 12 | R$ 4.510,90 | 8% |
-| Meta Ads / Instagram | 9 | R$ 2.149,76 | 2 | R$ 417,57 | 82% |
-| Chat no site | 2 | R$ 637,61 | 5 | R$ 1.361,90 | 29% |
-| IA (ChatGPT etc.) | 3 | R$ 1.252,20 | 0 | R$ 0,00 | 100% |
-| Afiliados | 2 | R$ 639,78 | 0 | R$ 0,00 | 100% |
+| Sem UTM | 21 | R$ 4.483,96 | 47 | R$ 11.078,52 | 31% |
+| App | 5 | R$ 1.676,18 | 51 | R$ 12.238,93 | 9% |
+| Google Ads | 17 | R$ 4.136,23 | 36 | R$ 8.393,18 | 32% |
+| WhatsApp | 6 | R$ 1.269,25 | 21 | R$ 4.959,65 | 22% |
+| E-mail | 1 | R$ 111,07 | 9 | R$ 2.925,60 | 10% |
+| Meta Ads / Instagram | 4 | R$ 696,89 | 6 | R$ 1.156,99 | 40% |
+| Chat no site | 3 | R$ 905,80 | 3 | R$ 872,49 | 50% |
+| IA (ChatGPT etc.) | 1 | R$ 319,46 | 1 | R$ 114,46 | 50% |
+| Afiliados | 0 | R$ 0,00 | 1 | R$ 155,81 | 0% |
 
-### Mês de outubro até agora — 01/10/2026 a 25/10/2026
+### Mês de setembro até agora — 01/09/2026 a 20/09/2026
 
-Pedidos: **1085** (29 cancelados, fora da receita abaixo).
+Pedidos: **670** (9 cancelados, fora da receita abaixo).
 
 | Tipo | Pedidos | % | Receita |
 |---|---:|---:|---:|
-| Novo | 355 | 34% | R$ 91.964,44 |
-| Recorrente | 701 | 66% | R$ 179.152,31 |
+| Novo | 162 | 25% | R$ 41.386,83 |
+| Recorrente | 499 | 75% | R$ 122.950,67 |
 
 <details><summary>Mês por canal</summary>
 
 | Canal | Novos | Receita novos | Recorrentes | Receita recorrentes | % novos |
 |---|---:|---:|---:|---:|---:|
-| Sem UTM | 111 | R$ 28.482,92 | 183 | R$ 45.624,11 | 38% |
-| Google Ads | 112 | R$ 29.126,42 | 153 | R$ 38.454,92 | 42% |
-| App | 29 | R$ 6.963,43 | 179 | R$ 46.230,08 | 14% |
-| WhatsApp | 53 | R$ 14.691,13 | 113 | R$ 27.940,36 | 32% |
-| E-mail | 3 | R$ 562,95 | 47 | R$ 13.679,43 | 6% |
-| Meta Ads / Instagram | 22 | R$ 5.713,80 | 13 | R$ 3.498,36 | 63% |
-| Chat no site | 7 | R$ 1.914,91 | 12 | R$ 3.571,07 | 37% |
-| IA (ChatGPT etc.) | 12 | R$ 3.080,70 | 1 | R$ 153,98 | 92% |
-| Afiliados | 6 | R$ 1.428,18 | 0 | R$ 0,00 | 100% |
+| Sem UTM | 61 | R$ 15.296,73 | 157 | R$ 38.136,35 | 28% |
+| App | 17 | R$ 4.974,87 | 128 | R$ 31.281,11 | 12% |
+| Google Ads | 44 | R$ 10.969,23 | 103 | R$ 25.216,56 | 30% |
+| WhatsApp | 19 | R$ 4.356,79 | 65 | R$ 15.432,28 | 23% |
+| E-mail | 4 | R$ 982,15 | 26 | R$ 7.918,57 | 13% |
+| Meta Ads / Instagram | 9 | R$ 2.195,76 | 10 | R$ 2.413,76 | 47% |
+| Chat no site | 4 | R$ 1.048,73 | 6 | R$ 1.936,11 | 40% |
+| IA (ChatGPT etc.) | 3 | R$ 1.142,46 | 2 | R$ 268,68 | 60% |
+| Afiliados | 1 | R$ 420,11 | 2 | R$ 347,25 | 33% |
 
 </details>
 
@@ -52,31 +52,33 @@ Pedidos: **1085** (29 cancelados, fora da receita abaixo).
 
 | Anterior → agora | Pedidos |
 |---|---:|
-| App → App | 45 |
-| Sem UTM → Sem UTM | 37 |
-| Google Ads → Google Ads | 32 |
-| WhatsApp → WhatsApp | 22 |
-| E-mail → E-mail | 9 |
-| Sem UTM → WhatsApp | 7 |
-| Sem UTM → App | 7 |
-| Google Ads → App | 6 |
-| App → Google Ads | 6 |
-| Chat no site → Chat no site | 5 |
-| Google Ads → Sem UTM | 5 |
-| Sem UTM → Google Ads | 5 |
-| App → Sem UTM | 4 |
-| Google Ads → WhatsApp | 3 |
-| WhatsApp → Sem UTM | 2 |
-| E-mail → App | 2 |
-| Meta Ads / Instagram → Sem UTM | 2 |
-| WhatsApp → App | 1 |
-| App → Meta Ads / Instagram | 1 |
-| App → E-mail | 1 |
-| E-mail → Google Ads | 1 |
-| App → WhatsApp | 1 |
-| WhatsApp → E-mail | 1 |
-| Meta Ads / Instagram → Meta Ads / Instagram | 1 |
+| App → App | 43 |
+| Sem UTM → Sem UTM | 36 |
+| Google Ads → Google Ads | 27 |
+| WhatsApp → WhatsApp | 18 |
+| Google Ads → Sem UTM | 8 |
+| E-mail → E-mail | 5 |
+| Meta Ads / Instagram → Meta Ads / Instagram | 4 |
+| Sem UTM → Google Ads | 4 |
+| App → Sem UTM | 3 |
+| WhatsApp → App | 3 |
+| App → Google Ads | 3 |
+| Google Ads → E-mail | 2 |
+| Google Ads → App | 2 |
+| WhatsApp → Google Ads | 2 |
+| Chat no site → Chat no site | 2 |
+| Sem UTM → App | 2 |
 | Sem UTM → E-mail | 1 |
+| Sem UTM → WhatsApp | 1 |
+| WhatsApp → E-mail | 1 |
+| E-mail → App | 1 |
+| E-mail → WhatsApp | 1 |
+| IA (ChatGPT etc.) → IA (ChatGPT etc.) | 1 |
+| Sem UTM → Meta Ads / Instagram | 1 |
+| WhatsApp → Meta Ads / Instagram | 1 |
+| Google Ads → Afiliados | 1 |
+| Google Ads → WhatsApp | 1 |
+| Sem UTM → Chat no site | 1 |
 
 </details>
 
@@ -84,19 +86,19 @@ Pedidos: **1085** (29 cancelados, fora da receita abaixo).
 
 | Canal | Novos | Receita novos | Recorrentes | Receita recorrentes | % novos |
 |---|---:|---:|---:|---:|---:|
-| (sem utm) | 26 | R$ 6.987,35 | 50 | R$ 12.225,17 | 34% |
-| google / search-marca | 14 | R$ 4.076,35 | 34 | R$ 10.018,25 | 29% |
-| app_android / app | 7 | R$ 1.664,82 | 41 | R$ 10.250,86 | 15% |
-| whatsapp / atendimento | 20 | R$ 5.462,26 | 20 | R$ 5.172,82 | 50% |
-| app_ios / app | 3 | R$ 464,82 | 20 | R$ 5.118,61 | 13% |
-| newsletter / ofertas-da-semana | 1 | R$ 216,79 | 12 | R$ 4.510,90 | 8% |
-| whatsapp / recompra | 0 | R$ 0,00 | 13 | R$ 3.481,59 | 0% |
-| google / shopping-geral | 8 | R$ 1.809,24 | 8 | R$ 1.025,97 | 50% |
-| google / pmax | 8 | R$ 2.366,22 | 2 | R$ 431,82 | 80% |
-| instagram / remarketing | 9 | R$ 2.149,76 | 2 | R$ 417,57 | 82% |
-| webchat / duvidas | 2 | R$ 637,61 | 5 | R$ 1.361,90 | 29% |
-| chatgpt.com | 3 | R$ 1.252,20 | 0 | R$ 0,00 | 100% |
-| parceiro-x | 2 | R$ 639,78 | 0 | R$ 0,00 | 100% |
+| (sem utm) | 21 | R$ 4.483,96 | 47 | R$ 11.078,52 | 31% |
+| google / search-marca | 8 | R$ 2.144,73 | 31 | R$ 7.411,00 | 21% |
+| app_android / app | 2 | R$ 553,55 | 34 | R$ 7.850,78 | 6% |
+| app_ios / app | 3 | R$ 1.122,63 | 17 | R$ 4.388,15 | 15% |
+| whatsapp / recompra | 0 | R$ 0,00 | 11 | R$ 3.119,20 | 0% |
+| whatsapp / atendimento | 6 | R$ 1.269,25 | 10 | R$ 1.840,45 | 38% |
+| newsletter / ofertas-da-semana | 1 | R$ 111,07 | 9 | R$ 2.925,60 | 10% |
+| google / shopping-geral | 4 | R$ 888,01 | 5 | R$ 982,18 | 44% |
+| instagram / remarketing | 4 | R$ 696,89 | 6 | R$ 1.156,99 | 40% |
+| webchat / duvidas | 3 | R$ 905,80 | 3 | R$ 872,49 | 50% |
+| google / pmax | 5 | R$ 1.103,49 | 0 | R$ 0,00 | 100% |
+| chatgpt.com | 1 | R$ 319,46 | 1 | R$ 114,46 | 50% |
+| parceiro-x | 0 | R$ 0,00 | 1 | R$ 155,81 | 0% |
 
 </details>
 

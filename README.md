@@ -30,9 +30,9 @@ Veja um exemplo com dados fictícios: baixe [docs/exemplo-painel.html](docs/exem
 
 **Escolha os dias no calendário**, ou use os atalhos da semana e do mês:
 
-![Calendário do painel com um intervalo de 06/10 a 17/10 selecionado](docs/painel-calendario.png)
+![Calendário do painel com um intervalo de 03/09 a 11/09 selecionado](docs/painel-calendario.png)
 
-**Clique num canal e o painel inteiro se ajusta.** Aqui, só o Google Ads: 42% de clientes novos,
+**Clique num canal e o painel inteiro se ajusta.** Aqui, só o Google Ads: 30% de clientes novos,
 ticket médio e evolução semanal do canal.
 
 ![Painel filtrado pelo canal Google Ads](docs/painel-filtro.png)
@@ -71,6 +71,12 @@ link da execução, desça até **Artifacts** e baixe **clientes-novos** (um `.z
 
 > **Limite da VTEX:** a API só devolve pedidos dos **últimos 2 anos**. Então "novo" quer dizer "sem
 > compra nos últimos 24 meses": quem comprou há 3 anos e voltou conta como novo.
+
+Outros casos em que um cliente antigo pode aparecer como novo:
+
+- comprou antes **só com e-mail** (sem CPF/CNPJ no pedido) e agora comprou com documento, ou o
+  contrário: a chave de busca muda e as compras não se encontram;
+- a busca da VTEX devolveu outros pedidos antes dos dele: o script confere os 3 primeiros resultados.
 
 ## Como usar (15 minutos)
 
@@ -136,17 +142,19 @@ WhatsApp, coloque as UTMs das duas na mesma regra.
 
 - A chave da VTEX só precisa de **leitura** de pedidos.
 - CPF, CNPJ e e-mail são usados **só em memória**, para achar compras anteriores, e não aparecem em
-  nenhum arquivo, log, issue, planilha ou painel.
+  nenhum arquivo, log, issue, planilha ou painel. Mensagens de erro da VTEX vão para o log sem a
+  busca e com documentos e e-mails mascarados.
 - O painel é um arquivo dentro do artefato privado do repositório; não é publicado em nenhum site.
-- A automação roda dentro do **seu** repositório privado, na **sua** conta do GitHub. Nenhum dado sai
-  para terceiros.
+- A automação roda dentro do **seu** repositório privado, na **sua** conta do GitHub. Os dados dos
+  pedidos não saem para terceiros. Ao abrir o painel, o navegador baixa só as fontes do Google Fonts.
 
 ## Custo e tempo
 
-Uma loja com ~700 pedidos por semana leva de ~4 minutos (começo do mês) a ~15 minutos (fim do mês,
-~3.000 pedidos) por execução. Repositório privado no plano gratuito do GitHub tem 2.000 minutos de
-Actions por mês, e esta automação usa ~40. Quando a VTEX limita as consultas (erro 429), o script
-espera e tenta de novo.
+O tempo cresce com o número de pedidos, porque cada pedido é aberto e o histórico do cliente é
+consultado. Uma loja com algumas centenas de pedidos por semana leva poucos minutos no começo do mês
+e até ~15 minutos no fim (o mês inteiro é relido). Repositório privado no plano gratuito do GitHub
+tem 2.000 minutos de Actions por mês, e esta automação usa algumas dezenas. Quando a VTEX limita as
+consultas (erro 429), o script espera e tenta de novo.
 
 ## Rodando no seu computador
 

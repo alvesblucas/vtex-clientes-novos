@@ -2,7 +2,7 @@
 // node --test
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -121,4 +121,37 @@ test('canais.json com regex inválida dá erro claro', () => {
   const bad = path.join(os.tmpdir(), 'canais-invalido.json')
   fs.writeFileSync(bad, JSON.stringify({ canais: [{ nome: 'Quebrado', padrao: '(' }] }))
   assert.throws(() => run({ CHANNELS_FILE: bad }), /expressão inválida no canal "Quebrado"/)
+})
+
+// Roda o script com a busca por cliente falhando e devolve tudo o que ele imprimiu (stdout + stderr).
+function runFailing(status) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'clientes-novos-'))
+  const r = spawnSync(process.execPath, ['--import', pathToFileURL(path.join(root, 'test/mock-vtex.mjs')).href, path.join(root, 'scripts/clientes-novos.mjs')], {
+    cwd: dir,
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      VTEX_ACCOUNT: 'lojateste',
+      VTEX_APP_KEY: 'chave',
+      VTEX_APP_TOKEN: 'token',
+      WEEK_START: '2026-10-19',
+      MOCK_FIXTURE: path.join(root, 'test/fixtures/semana.json'),
+      MOCK_FALHA_BUSCA: String(status),
+    },
+  })
+  return { code: r.status, out: r.stdout + r.stderr }
+}
+
+test('erro na busca por cliente não leva CPF/CNPJ para o log', () => {
+  const { out } = runFailing(400)
+  assert.match(out, /\[erro\].*GET \/api\/oms\/pvt\/orders -> 400/)
+  assert.match(out, /\[documento\]/) // o corpo do erro repetia o CPF; saiu mascarado
+  assert.doesNotMatch(out, /\d{11}|q=\d/)
+})
+
+test('chave sem acesso: para com erro claro, sem CPF/CNPJ no log', () => {
+  const { code, out } = runFailing(403)
+  assert.notEqual(code, 0)
+  assert.match(out, /a chave não tem acesso/)
+  assert.doesNotMatch(out, /\d{11}|q=\d/)
 })

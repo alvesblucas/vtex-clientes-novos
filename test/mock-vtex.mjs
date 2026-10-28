@@ -31,6 +31,10 @@ globalThis.fetch = async (url) => {
   }
   const [, from, to] = u.searchParams.get('f_creationDate').match(/\[(.*) TO (.*)\]/)
   const q = u.searchParams.get('q')
+  // MOCK_FALHA_BUSCA=400|403: a busca por cliente falha, e o corpo do erro repete o valor buscado.
+  if (q && process.env.MOCK_FALHA_BUSCA) {
+    return Response.json({ error: { message: `consulta inválida: q=${q}` } }, { status: Number(process.env.MOCK_FALHA_BUSCA) })
+  }
   const list = Object.keys(orders)
     .filter((id) => {
       const t = Date.parse(orders[id].creationDate)
