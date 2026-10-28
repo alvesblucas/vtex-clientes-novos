@@ -117,6 +117,11 @@ Opcionais (aba **Variables**):
 
 ### 4. Rode a primeira vez
 
+> Em repositório criado a partir do template, o GitHub deixa o Actions desligado e mostra
+> "Workflows aren't being run on this repository". Abra a aba **Actions** e clique em
+> **Enable Actions** (ou "I understand my workflows, go ahead and enable them"). Sem isso, nem a
+> execução manual nem a de segunda rodam.
+
 **Actions → Clientes novos x recorrentes → Run workflow.** Em poucos minutos aparece a issue
 "Clientes novos x recorrentes" com o resumo da semana anterior. A partir daí, roda sozinho toda
 segunda às 08h15 (horário de Brasília).
