@@ -49,8 +49,14 @@ const headers = {
 }
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 
+// A busca por cliente leva o CPF/CNPJ ou e-mail na URL (q=...), e a resposta de erro da VTEX pode
+// repetir esse valor. As mensagens de erro vão para o log: levam o caminho sem a query e o corpo
+// com documentos e e-mails mascarados.
+const mask = (text) => text.replace(/[^\s"'<>]+@[^\s"'<>]+/g, '[e-mail]').replace(/\d[\d.\/-]{9,}\d/g, '[documento]')
+
 // 429 (limite da OMS) e 5xx: espera o Retry-After, ou 2s, 4s, 8s, 16s, 32s, antes de desistir.
 async function api(path, tries = 6) {
+  const shown = path.split('?')[0]
   for (let i = 1; i <= tries; i++) {
     const res = await fetch(base + path, { headers })
     if (res.ok) return res.json().catch(() => null)
@@ -60,9 +66,9 @@ async function api(path, tries = 6) {
       continue
     }
     if (res.status === 401 || res.status === 403) {
-      throw new Error(`GET ${path} -> ${res.status}: a chave não tem acesso. Ela precisa dos recursos "View order" e "List Orders" (OMS).`)
+      throw new Error(`GET ${shown} -> ${res.status}: a chave não tem acesso. Ela precisa dos recursos "View order" e "List Orders" (OMS).`)
     }
-    throw new Error(`GET ${path} -> ${res.status} ${(await res.text()).slice(0, 200)}`)
+    throw new Error(`GET ${shown} -> ${res.status} ${mask(await res.text()).slice(0, 200)}`)
   }
 }
 
